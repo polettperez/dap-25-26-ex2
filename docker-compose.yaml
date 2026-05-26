@@ -1,0 +1,52 @@
+services:
+  dap-postgres:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: postgres:14.23-alpine3.23
+    container_name: dap-postgres
+    networks:
+      - dap-postgres-net
+    environment:
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=gitea
+    volumes:
+      - dap-postgres-data:/var/lib/postgresql/data
+
+  dap-pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dap-pgadmin
+    ports:
+      - "8088:80"
+    networks:
+      - dap-postgres-net
+    depends_on:
+      - dap-postgres
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+
+  dap-gitea:
+    container_name: dap-gitea
+    image: gitea/gitea:main-nightly-rootless
+    ports:
+      - "3005:3000"
+    environment:
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=dap-postgres:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=admin
+      - GITEA__database__PASSWD=admin123
+    networks:
+      - dap-postgres-net
+    depends_on:
+      - dap-postgres
+
+
+networks:
+  dap-postgres-net:
+    driver: bridge
+volumes:
+  dap-postgres-data:
+    driver: local

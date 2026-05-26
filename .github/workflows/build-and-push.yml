@@ -22,4 +22,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: paulaperezrodriguez/dap-mariadb:latest
+          tags: paulaperezrodriguez/dap-postgress:latest

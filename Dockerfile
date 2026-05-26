@@ -1,11 +1,13 @@
-FROM debian:stable-slim as build
+FROM alpine:3.22.4 AS build
 
-RUN apt-get update && apt-get install curl unzip -y
+RUN apk add --no-cache curl unzip
 
-RUN curl -o /sample.zip https://downloads.mysql.com/docs/world-db.zip
+RUN curl -o /pagila.zip https://github.com/devrimgunduz/pagila/archive/refs/heads/master.zip
 
-RUN unzip -j /sample.zip '**/*.sql' -d sampledb
+RUN unzip /pagila.zip -d /tmp
 
-FROM mariadb:lts
 
-COPY --from=build /sampledb /docker-entrypoint-initdb.d/
+FROM postgres:14.23-alpine3.23
+
+COPY --from=build /tmp/pagila-master/pagila-schema.sql /docker-entrypoint-initdb.d/01-schema.sql
+COPY --from=build /tmp/pagila-master/pagila-data.sql /docker-entrypoint-initdb.d/02-data.sql
