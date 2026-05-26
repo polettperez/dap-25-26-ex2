@@ -2,7 +2,7 @@ FROM alpine:3.22.4 AS build
 
 RUN apk add --no-cache curl unzip
 
-RUN curl -o /pagila.zip https://github.com/devrimgunduz/pagila/archive/refs/heads/master.zip
+RUN curl -L -o /pagila.zip https://github.com/devrimgunduz/pagila/archive/refs/heads/master.zip
 
 RUN unzip /pagila.zip -d /tmp
 
